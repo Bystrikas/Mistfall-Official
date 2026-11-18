@@ -1,0 +1,28 @@
+name: Build Android APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  android:
+    runs-on: ubuntu-latest
+    container:
+      image: barichello/godot-ci:4.3.0
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Export Android debug APK
+        run: |
+          mkdir -p Mistfall/build
+          godot --headless --verbose --path Mistfall --export-debug "Android" Mistfall/build/MISTFALL-debug.apk
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: MISTFALL-Android-APK
+          path: Mistfall/build/MISTFALL-debug.apk
+          if-no-files-found: error
+          retention-days: 7
